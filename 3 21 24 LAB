@@ -1,0 +1,204 @@
+TASK 2: most important day for all.
+
+q1. give internet to your vpnrouter using 192.168.108.2 as gateway and 108.8/24 as your Gi 1 IP address.
+
+
+0@vpnPH:
+conf t
+int gi 1
+no shut
+ip add 192.168.108.8 255.255.255.0
+ip route 0.0.0.0 0.0.0.0 192.168.108.2
+ip route 0.0.0.0 0.0.0.0 192.168.108.4 20
+
+q2. give your vpnph a domain name and DNS server: 8.8.8.8
+
+conf t
+ip domain name ccna.com
+ip name-server 8.8.8.8 1.1.1.1
+
+q3. create standard access-list (1-99) layer3 firewall.
+create a layer 3 (network: ip address) FW to block the top 3 pornsites.
+pornhub.com - 66.254.114
+faketaxi - 66.254.114
+bagbros - 66.254.114
+pornhat - 172.67.74
+porntube - 104.23.135
+
+@standard acl: block source IP
+conf t
+no access-list 1
+access-list 1 deny 66.254.0.0 0.0.255.255
+access-list 1 deny 172.67.0.0 0.0.255.255
+access-list 1 deny 104.23.0.0 0.0.255.255
+access-list 1 deny 104.21.0.0 0.0.255.255
+access-list 1 permit Any
+do sh ip access-list
+end
+
+@standard acl: block source IP
+conf t
+no IP access-list standard NOPORN
+IP access-list standard NOPORN
+deny 66.254.0.0 0.0.255.255
+deny 172.67.0.0 0.0.255.255
+deny 104.23.0.0 0.0.255.255
+deny 104.21.0.0 0.0.255.255
+permit Any
+do sh ip access-list
+end
+
+how  to lock a interface using ACL:
+conf t
+int gi 1
+ip access-group NOPORN in
+
+
+q4. using NETWORK address translation/NAT give internet to BLDGPH1 and BLDGPH2
+
+What is NAT: 
+give static ip address to bldgs.
+@VPNPH:
+conf t 
+int gi 2
+no shut
+ip add 192.168.102.8 255.255.255.0
+
+@bldg1:
+sudo ifconfig eth0 192.168.102.11 netmask 255.255.255.0 up
+sudo route add default gw 192.168.102.8
+
+@bldg2:
+sudo ifconfig eth0 192.168.102.12 netmask 255.255.255.0 up
+sudo route add default gw 192.168.102.8
+
+
+How to implement real world network address translation
+conf t
+int Gi 1
+ip NAT outside
+int Gi 2
+ip NAT inside
+access-list 2 permit 192.168.102.0 0.0.0.255
+ip nat inside source static 192.168.102.11 192.168.108.69
+ip nat inside source static 192.168.102.12 192.168.108.68
+ip nat inside source list 2 int gi 1 overload
+how to check: sh ip nat translations
+
+
+conf t
+no IP access-list standard NOSCHOOL
+IP access-list standard NOSCHOOL
+deny 110.34.0.0 0.0.255.255
+deny 162.241.0.0 0.0.255.255
+deny 166.62.0.0 0.0.255.255
+deny 208.97.0.0 0.0.255.255
+permit Any
+
+
+Q3. Protect your websites and appss with firewall/cloudfare(proxy)
+how to be a CyberSecurity Analyst
+1. master the OSI layer.
+2.learn hacking tools: nmap,nessus,metasploit,aircrack,etc..
+3. join capturethe flag games/hackable websites
+
+config t
+ip host www.web8.com 192.168.102.8 
+ip host www.web9.com 192.168.102.9 
+int gi 2
+ ip add 192.168.102.9 255.255.255.0 Secondary
+service finger
+service tcp-small-servers
+service udp-small-servers
+ip dns server
+ip http server
+ip http secure-server
+end
+
+advancelevel: softwarecracking
+c:\windows\system32\drivers\etc
+
+4. create a firewall to protect web8 and web9 with these condition:
+web8 is a web and secureweb server. 80 443
+web9 is an ssh and dns server. 22 53
+SOLUTION:
+ USE EXTENDED ACL: 100 - 199
+@vpn:                PROTOCOL       HACKER VICTIM PORT
+                     tc,udp,icmp,IP
+conf t
+no access-list 100
+access-list 100 permit tcp any host www.web8.com eq 80
+access-list 100 permit tcp any host www.web8.com eq 443
+access-list 100 permit tcp any host www.web9.com eq 22
+access-list 100 permit tcp any host www.web9.com eq 53
+!access-list 100 deny ip any MATIC MERON kapag may permit
+int Gi 2
+ip access-group 100 in
+
+ANOTHER METHOD:
+conf t
+no ip access-list extended FWPOLICY1
+ip access-list extended FWPOLICY1
+ permit tcp any host www.web8.com eq 80
+ permit tcp any host www.web8.com eq 443
+ permit tcp any host www.web9.com eq 22
+ permit tcp any host www.web9.com eq 53
+!access-list 100 deny ip any MATIC MERON kapag may permit
+int Gi 2
+ip access-group FWPOLICY in
+
+2.create a FWPOLICY2 to allow these conditions.
+openg ping, dns. https on web8 = 3 lines
+open everything on web9 = 1 libe
+conf t
+no ip access-list extended FWPOLICY2
+ip access-list extended FWPOLICY2
+permit icmp any host www.web8.com
+permit tcp any host www.web8.com eq 53
+permit tcp any host www.web8.com eq 443
+permit IP any host www.web9.com
+Int Gi 2
+ip access-group FWPOLICY2 in
+
+conf t
+no telephony-service
+telephony-service
+no auto-reg-ephone
+max-ephones 5
+max-dn 20
+ip source-address 192.168.102.8 port 2000
+create cnf-file
+voice service voip
+allow-connections sip to h323
+allow-connections sip to sip
+sip
+bind control source-interface Gi 2
+
+voice register global
+mode cme
+source-address 192.168.102.8 port 5060
+max-dn 12
+max-pool 12
+do sh
+!NOTE: kapag magdedelete ng access *no ip access-group FWPOLICY2 in*
+
+
+FINALLAB:
+create a policy: HAYUPFW1 that uses theses conditions:
+web8 is ping, dns,web,https, ssh server = 4 lines icmp,53,
+web9 telephony server for cisco,non-cisco = 2000,5060/5061
+
+conf t
+no ip access-list extended HAYUPFW1
+ip access-list extended HAYUPFW1
+permit icmp any host www.web9.com
+permit tcp any host www.web9.com eq 53
+permit tcp any host www.web9.com eq 80
+permit tcp any host www.web9.com eq 443
+permit tcp any host www.web9.com eq 22
+permit tcp any host www.web8.com eq 2000
+permit tcp any host www.web8.com eq 5060
+permit tcp any host www.web8.com eq 5061
+Int Gi 2
+ip access-group HAYUPFW1 in
+end
