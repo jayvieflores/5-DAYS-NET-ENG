@@ -202,3 +202,26 @@ permit tcp any host www.web8.com eq 5061
 Int Gi 2
 ip access-group HAYUPFW1 in
 end
+
+labexam4: NTP or network time protocol
+NTP is a network service that synchronize your time with timeserver(USA)
+synchronize your VPNPH to the time.google.com of the headOffice:
+show clock
+
+conf t
+ip domain lookup
+ip name-server 8.8.8.8 1.1.1.1
+ntp server time.google.com
+end
+-sh ntp associations
+-sh clock
+
+
+lab5: configuring ssh instead of telnet.
+how to configure ssh:
+conf t
+ip domain name ccna.com
+crypto key generate rsa 
+*enter* 1024
+ip ssh ver 2
+ip ssh time-out 120
