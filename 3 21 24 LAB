@@ -225,3 +225,19 @@ crypto key generate rsa
 *enter* 1024
 ip ssh ver 2
 ip ssh time-out 120
+
+
+how to configure
+import cli
+
+hi_1 = '''hostname PYDEVOP_AKO
+int loop 9
+ip add 9.9.9.9 255.255.255.255
+int loop 8
+ip add 8.8.8.8 255.255.255.255
+int loop 7
+ip add 7.7.7.7 255.255.255.255
+end
+'''
+
+cli.configurep(hi_1)
